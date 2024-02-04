@@ -2,8 +2,10 @@ import random
 class Board:
     # done up to counting heuristics
     boardList = []
-    def __init__(self):
-        self.resetBoard()
+    def __init__(self, boardList):
+        self.boardList = boardList
+        if boardList == []:
+            self.resetBoard()
     
     def resetBoard(self):
         self.boardList = [[0 for i in range(8)] for j in range(8)]
@@ -87,10 +89,35 @@ class Board:
         conflict = set()
         for i in range(1, 8):
             
-            if column - i > -1 and row + i > -1:
+            if column - i > -1 and row - i > -1:
                 if (self.boardList[column - i][row - i] == 1):
                     conflict.add(tuple([column, row]))
             else:
                 break
         return conflict
+    
+    def generateNextBoardList(self):
+        permutationBoard = Board(self.boardList)
+        nextBoardList = []
+
+        for row in range(8):
+            for column in range(8):
+                if permutationBoard.boardList[column][row] == 1:
+                    for i in range(7, 0, -1):
+                        if i == row:
+                            continue
+                        
+                        nextBoardList.append((Board((permutationBoard.moveQueen(column, i)).boardList)))
+        return nextBoardList
+    
+    def setBoardList(self, boardList):
+        self.boardList = boardList
+
+    def testPrintBoards(self, nextBoardList):
+        for Board in nextBoardList:
+            Board.printBoard()
+
+
+
+
     
