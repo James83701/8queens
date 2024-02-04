@@ -1,59 +1,107 @@
 import random
+import copy
+
 class Board:
-    # done up to counting heuristics
     boardList = []
-    def __init__(self, boardList):
+    queenCoordinates = []
+    queensInConflict = set()
+    def __init__(self, boardList: list):
         self.boardList = boardList
         if boardList == []:
             self.resetBoard()
+        self.getQueens()
     
-    def resetBoard(self):
+    
+
+    def resetBoard(self) -> None:
         self.boardList = [[0 for i in range(8)] for j in range(8)]
         
         for column in range(8):
             self.boardList[column][random.randint(0, 7)] = 1
+    
+    def getQueens(self) -> None:
+        self.queenCoordinates = []
+        for column in range(8):
+            for row in range(8):
+                if self.boardList[column][row] == 1:
+                    self.queenCoordinates.append([column, row])
 
-    def printBoard(self):
+    def printBoard(self) -> None:
         for row in range(8):
             for column in range(8):
                 print(self.boardList[column][row], end = '')
                 if column != 7:
                     print(", ", end = '')
             print("")
+        print("-------------------")
 
-    def moveQueen(self, column, newRow):
+    def moveQueen(self, column: int, newRow: int) -> None:
         for row in range(8):
             self.boardList[column][row] = 0
         self.boardList[column][newRow] = 1  
+        self.getQueens()
 
-    def checkRow(self, column, row):
+
+    
+    def generateNextListOfBoards(self):
+        
+        nextListOfBoards = []
+        for queen in self.queenCoordinates:
+            permutationBoard = copy.deepcopy(self)
+            for rowChange in range(7, 0, -1):
+                if queen[1] == rowChange:
+                    continue
+                else:
+                    permutationBoard.moveQueen(queen[0], rowChange)
+                    nextListOfBoards.append(copy.deepcopy(permutationBoard))
+        return nextListOfBoards
+        # for row in range(8):
+        #     for column in range(8):
+        #         if permutationBoard.boardList[column][row] == 1:
+        #             for i in range(7, 0, -1):
+        #                 if i == row:
+        #                     continue
+                        
+        #                 nextBoardList.append((Board((permutationBoard.moveQueen(column, i)).boardList)))
+        # return nextBoardList
+    
+    def setBoardList(self, boardList):
+        self.boardList = boardList
+
+    def testPrintBoards(self, nextBoardList):
+        for Board in nextBoardList:
+            Board.printBoard()
+
+
+####################
+    def countH(self) -> set:
+        queensInConflict = set()
+        for queen in self.queenCoordinates:#inprogress
+            queensInConflict = queensInConflict.union(self.checkRow(column, row))
+            queensInConflict = queensInConflict.union(self.checkDiagonal(column, row))
+        
+        return queensInConflict
+
+    def checkRow(board: Board, column: int, row: int) -> set:
         conflict = set()
         for checkColumn in range(8):
-            if (self.boardList[checkColumn][row] == 1) and column != checkColumn:
+            if (board.boardList[checkColumn][row] == 1) and column != checkColumn:
                 conflict.add(tuple([checkColumn, row]))
                 conflict.add(tuple([column, row]))
                 
         return conflict
 
-    def countH(self):
-        queensInConflict = set()
-        for row in range(8):
-            for column in range(8):
-                if self.boardList[column][row] == 1:
-                    queensInConflict = queensInConflict.union(self.checkRow(column, row))
-                    queensInConflict = queensInConflict.union(self.checkDiagonal(column, row))
-        
-        return queensInConflict
 
-    def checkDiagonal(self, column, row):
+
+    def checkDiagonal(self, column: int, row: int) -> set:
         conflict = set()
         conflict = conflict.union(self.checkDiagonalNorthEast(column, row))
         conflict = conflict.union(self.checkDiagonalNorthWest(column, row))
         conflict = conflict.union(self.checkDiagonalSouthEast(column, row))
         conflict = conflict.union(self.checkDiagonalSouthWest(column, row))
         return conflict
-    
-    def checkDiagonalNorthEast(self, column, row):
+
+    def checkDiagonalNorthEast(self, column: int, row: int) -> set:
         conflict = set()
         for i in range(1, 8):
             
@@ -64,8 +112,8 @@ class Board:
                 break
 
         return conflict
-    
-    def checkDiagonalNorthWest(self, column, row): # col -, row +
+
+    def checkDiagonalNorthWest(self, column: int, row: int) -> set: # col -, row +
         conflict = set()
         for i in range(1, 8):
             if column - i > -1 and row + i < 8:
@@ -74,8 +122,8 @@ class Board:
             else:
                 break
         return conflict
-    
-    def checkDiagonalSouthEast(self, column, row):# col +, row -
+
+    def checkDiagonalSouthEast(self, column: int, row: int) -> set:# col +, row -
         conflict = set()
         for i in range(1, 8):
             if column + i < 8 and row - i > -1:
@@ -84,8 +132,8 @@ class Board:
             else:
                 break
         return conflict
-    
-    def checkDiagonalSouthWest(self, column, row):# col -, row -
+
+    def checkDiagonalSouthWest(self, column: int, row: int) -> set:# col -, row -
         conflict = set()
         for i in range(1, 8):
             
@@ -95,29 +143,3 @@ class Board:
             else:
                 break
         return conflict
-    
-    def generateNextBoardList(self):
-        permutationBoard = Board(self.boardList)
-        nextBoardList = []
-
-        for row in range(8):
-            for column in range(8):
-                if permutationBoard.boardList[column][row] == 1:
-                    for i in range(7, 0, -1):
-                        if i == row:
-                            continue
-                        
-                        nextBoardList.append((Board((permutationBoard.moveQueen(column, i)).boardList)))
-        return nextBoardList
-    
-    def setBoardList(self, boardList):
-        self.boardList = boardList
-
-    def testPrintBoards(self, nextBoardList):
-        for Board in nextBoardList:
-            Board.printBoard()
-
-
-
-
-    
