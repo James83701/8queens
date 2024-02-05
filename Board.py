@@ -5,13 +5,18 @@ class Board:
     boardList = []
     queenCoordinates = []
     queensInConflict = set()
+    H = 999
     def __init__(self, boardList: list):
         self.boardList = boardList
         if boardList == []:
             self.resetBoard()
         self.getQueens()
+        self.countH()
     
-    
+    def copyinit(self):
+        self.queensInConflict = set()
+        self.getQueens()
+        self.countH()
 
     def resetBoard(self) -> None:
         self.boardList = [[0 for i in range(8)] for j in range(8)]
@@ -33,7 +38,6 @@ class Board:
                 if column != 7:
                     print(", ", end = '')
             print("")
-        print("-------------------")
 
     def moveQueen(self, column: int, newRow: int) -> None:
         for row in range(8):
@@ -53,6 +57,7 @@ class Board:
                     continue
                 else:
                     permutationBoard.moveQueen(queen[0], rowChange)
+                    permutationBoard.copyinit()
                     nextListOfBoards.append(copy.deepcopy(permutationBoard))
         return nextListOfBoards
         # for row in range(8):
@@ -74,18 +79,17 @@ class Board:
 
 
 ####################
-    def countH(self) -> set:
-        queensInConflict = set()
-        for queen in self.queenCoordinates:#inprogress
-            queensInConflict = queensInConflict.union(self.checkRow(column, row))
-            queensInConflict = queensInConflict.union(self.checkDiagonal(column, row))
-        
-        return queensInConflict
+    def countH(self):
+        for queen in self.queenCoordinates:
+            self.queensInConflict = self.queensInConflict.union(self.checkRow(queen[0], queen[1]))
+            self.queensInConflict = self.queensInConflict.union(self.checkDiagonal(queen[0], queen[1]))
+        self.H = len(self.queensInConflict)
 
-    def checkRow(board: Board, column: int, row: int) -> set:
+
+    def checkRow(self, column: int, row: int) -> set:
         conflict = set()
         for checkColumn in range(8):
-            if (board.boardList[checkColumn][row] == 1) and column != checkColumn:
+            if (self.boardList[checkColumn][row] == 1) and column != checkColumn:
                 conflict.add(tuple([checkColumn, row]))
                 conflict.add(tuple([column, row]))
                 
