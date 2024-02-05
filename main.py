@@ -27,6 +27,7 @@ def findNextState(nextB):
         restarts += 1
     else:
         print(f"Neighbors found with lower h: {neighborWithLowerH}")
+        print("Setting new current state")
         chessBoard = copy.deepcopy(nextBoard)
         chessBoard.copyinit()
         stateChanges += 1
@@ -39,14 +40,11 @@ while chessBoard.H != 0:
     print(f"Current h: {chessBoard.H}")
     print("Current State")
     chessBoard.printBoard()
-    print("")
     nextB = chessBoard.generateNextListOfBoards()
     findNextState(nextB)
-print("------------------------V---------------")
 print("Current State")
 chessBoard.printBoard()
 print("Solution Found!")
-print(f"h:{chessBoard.H}")
 print(f"State changes: {stateChanges}")
 print(f"Restarts: {restarts}")
 
