@@ -26,6 +26,7 @@ def findNextState(nextB):
         chessBoard = Board([])
         restarts += 1
     else:
+        print(f"Neighbors found with lower h: {neighborWithLowerH}")
         chessBoard = copy.deepcopy(nextBoard)
         chessBoard.copyinit()
         stateChanges += 1
